@@ -17,18 +17,18 @@ using namespace std;
 // };
 
 int main(){
-	string ip = "0192.168.00.1";
+	string ip = "192.168.0.1";
 
-	smatch ip_format;
-	smatch zero_errors;
+	// regex ip_basic_format_regex ("(^(\d{1,3}\.){3}\d{1,3}$)");
+	// regex ip_zero_validation_regex ("((^0\d+)|(\.0\d+))");
 
-	regex ip_basic_format_regex ("(^(\d{1,3}\.){3}\d{1,3}$)");
-	regex ip_zero_validation_regex ("((^0\d+)|(\.0\d+))");
+	smatch matches;
+	regex reg("^(\\d{1,3}\\.){3}\\d{1,3}$");
 
-	regex_match(ip, ip_format, ip_basic_format_regex);
-	regex_match(ip, zero_errors, ip_zero_validation_regex);
-	
+	regex_match(ip, matches, reg);
 
-	cout<<ip_format.size()<<endl;
-	cout<<zero_errors.size()<<endl;
+	cout<<matches.size()<<endl;
+	cout<<matches.str()<<endl<<endl;
+	cout<<matches[0]<<endl;
+	cout<<matches[1]<<endl;
 }
