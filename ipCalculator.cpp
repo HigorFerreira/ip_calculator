@@ -23,12 +23,16 @@ int main(){
 	// regex ip_zero_validation_regex ("((^0\d+)|(\.0\d+))");
 
 	smatch matches;
-	regex reg("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
+	regex reg("\\d{1,3}");
 
-	regex_match(ip, matches, reg);
+	regex_search(ip, matches, reg);
 
-	cout<<matches.size()<<endl;
-	cout<<matches.str()<<endl<<endl;
-	cout<<matches[0]<<endl;
-	cout<<matches[1]<<endl;
+	sregex_iterator currentMatch(ip.begin(), ip.end(), reg);
+	sregex_iterator lastMatch;
+
+	while(currentMatch != lastMatch){
+		smatch match = *currentMatch;
+		cout<<match.str()<<endl;
+		currentMatch++;
+	}
 }
