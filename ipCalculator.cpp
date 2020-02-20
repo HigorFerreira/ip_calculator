@@ -24,7 +24,7 @@ class IP {
 			smatch ipFormatMatch;
 			regex ipFormatRegex("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 			regex_match(ip, ipFormatMatch, ipFormatRegex);
-			return ipFormatMatch.empty();
+			return !ipFormatMatch.empty();
 		}
 
 	public:
@@ -52,7 +52,7 @@ class IP {
 
 int main(){
 	
-	IP ip("192.168.0.1");
+	IP ip("192.18.0.1");
 
 	ip.test();
 }
