@@ -17,13 +17,13 @@ using namespace std;
 // };
 
 int main(){
-	string ip = "192.168.0.1";
+	string ip = "0192.168.00.1";
 
 	// regex ip_basic_format_regex ("(^(\d{1,3}\.){3}\d{1,3}$)");
 	// regex ip_zero_validation_regex ("((^0\d+)|(\.0\d+))");
 
 	smatch matches;
-	regex reg("\\d{1,3}");
+	regex reg("(^0\\d+)|(\\.0\\d+)");
 
 	regex_search(ip, matches, reg);
 
