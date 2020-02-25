@@ -23,8 +23,37 @@ class IP {
 		bool ipFormatVerification(string &ip){
 			smatch ipFormatMatch;
 			regex ipFormatRegex("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
-			regex_match(ip, ipFormatMatch, ipFormatRegex);
-			return !ipFormatMatch.empty();
+			if(regex_match(ip, ipFormatMatch, ipFormatRegex)){
+				return true;
+			}
+			else{
+				errors.push_back("O ip digitado possui um formato incorreto");
+				return false;
+			}
+		}
+
+		/**
+		 * Função que verifica a existência de digitos zero
+		 * inválidos no ip, exemplo: 192.01.0.1
+		 * **/
+		bool ipZerosValidation(string &ip){
+			bool valid = true;
+			smatch matches;
+			regex reg("(^0\\d+)|(\\.0\\d+)");
+
+			regex_search(ip, matches, reg);
+
+			sregex_iterator currentMatch(ip.begin(), ip.end(), reg);
+			sregex_iterator lastMatch;
+
+			while(currentMatch != lastMatch){
+				valid = false;
+				smatch match = *currentMatch;
+				errors.push_back("O bloco: " + match.str() + "está incorreto");
+				currentMatch++;
+			}
+
+			return valid;
 		}
 
 	public:
