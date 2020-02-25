@@ -73,6 +73,42 @@ class IP {
 				octets.push_back(stoi(match.str()));
 				currentMatch++;
 			}
+
+			return true;
+		}
+
+		/**
+		 * Função que define o classe do Ip,
+		 * e suas máscaras na notação decimal e CDIR
+		 * **/
+		bool setIpClass(){
+			if(octets.size() < 1) return false;
+
+			if(octets.at(0) >> 7 == 0){
+				ipClass = 'A';
+				classlessIpMask = '255.0.0.0';
+				classlessIpCdir = '/8';
+			}
+			else if(octets.at(0) >> 6 == 0b10){
+				ipClass = 'B';
+				classlessIpMask = '255.255.0.0';
+				classlessIpCdir = '/16';
+			}
+			else if(octets.at(0) >> 5 == 0b110){
+				ipClass = 'C';
+				classlessIpMask = '255.255.255.0';
+				classlessIpCdir = '/24';
+			}
+			else if(octets.at(0) >> 5 == 0b111){
+				ipClass = 'D';
+				classlessIpMask = '255.255.255.255';
+				classlessIpCdir = '/32';
+			}
+			else{
+				return false;
+			}
+
+			return true;
 		}
 
 	public:
