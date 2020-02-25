@@ -20,7 +20,7 @@ class IP {
 		 * X um dígito decimal, podendo o número de digitos variar
 		 * de 1 à 3.
 		 * Retorna falso caso contrário  * */
-		bool ipFormatVerification(string &ip){
+		bool ipFormatValidator(string &ip){
 			smatch ipFormatMatch;
 			regex ipFormatRegex("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
 			if(regex_match(ip, ipFormatMatch, ipFormatRegex)){
@@ -36,7 +36,7 @@ class IP {
 		 * Função que verifica a existência de digitos zero
 		 * inválidos no ip, exemplo: 192.01.0.1
 		 * **/
-		bool ipZerosValidation(string &ip){
+		bool ipZerosValidator(string &ip){
 			bool valid = true;
 			smatch matches;
 			regex reg("(^0\\d+)|(\\.0\\d+)");
@@ -51,6 +51,22 @@ class IP {
 				smatch match = *currentMatch;
 				errors.push_back("O bloco: " + match.str() + "está incorreto");
 				currentMatch++;
+			}
+
+			return valid;
+		}
+
+		/**
+		 * Validação do intervalo dos octetos
+		 * **/
+		bool octetsRageValidator(){
+			bool valid = true;
+
+			for(size_t i = 0; i < octets.size(); i++){
+				if(octets.at(i) < 0 || octets.at(i) > 255){
+					valid = false;
+					errors.push_back("O " + (i+1) + "º octeto " + octets.at(i) + " está fora de intervalo.");
+				}
 			}
 
 			return valid;
@@ -116,7 +132,7 @@ class IP {
 		/**
 		 * Construtor da classe, no qual todo novo ip é inserido **/
 		IP(string ip){
-			if(ipFormatVerification(ip)){
+			if(ipFormatValidator(ip)){
 				octets.push_back(stoi(ip));
 			}
 			else{
