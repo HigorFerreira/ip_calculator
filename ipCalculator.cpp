@@ -56,6 +56,25 @@ class IP {
 			return valid;
 		}
 
+		/**
+		 * Função que separa os octetos
+		 * **/
+		bool breakOctets(string &ip){
+			smatch matches;
+			regex reg("\\d{1,3}");
+
+			regex_search(ip, matches, reg);
+
+			sregex_iterator currentMatch(ip.begin(), ip.end(), reg);
+			sregex_iterator lastMatch;
+
+			while(currentMatch != lastMatch){
+				smatch match = *currentMatch;
+				octets.push_back(stoi(match.str()));
+				currentMatch++;
+			}
+		}
+
 	public:
 
 		/**
