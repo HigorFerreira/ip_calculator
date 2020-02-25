@@ -1,6 +1,7 @@
 #include<iostream>
 #include<regex>
 #include<vector>
+#include<functional>
 
 using namespace std;
 
@@ -13,6 +14,8 @@ class IP {
 		string completeIpAddress;
 		string classlessIpMask;
 		string classlessIpCdir;
+
+		//============================ VALIDADORES =================================================
 
 		/**
 		 * Função de validação do IP pelo formato
@@ -65,12 +68,14 @@ class IP {
 			for(size_t i = 0; i < octets.size(); i++){
 				if(octets.at(i) < 0 || octets.at(i) > 255){
 					valid = false;
-					errors.push_back("O " + (i+1) + "º octeto " + octets.at(i) + " está fora de intervalo.");
+					// errors.push_back("O " + (i+1) + "º octeto \"" + octets.at(i) + "\" está fora de intervalo.");
 				}
 			}
 
 			return valid;
 		}
+
+		//============================ VALIDADORES =================================================
 
 		/**
 		 * Função que separa os octetos
@@ -148,11 +153,17 @@ class IP {
 				cout<<errors.at(0);
 			}
 		}
+
+		void print(function<void> *(callback)(IP*)){
+			callback(this);
+		}
 };
 
 int main(){
 	
 	IP ip("192.18.0.1");
 
-	ip.test();
+	// ip.print([](IP *some){
+
+	// });
 }
