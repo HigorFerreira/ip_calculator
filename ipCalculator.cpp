@@ -13,7 +13,7 @@ class IP {
 		
 		string completeIpAddress;
 		string classlessIpMask;
-		string classlessIpCdir;
+		int classlessIpCdir;
 
 		//============================ VALIDADORES =================================================
 
@@ -108,22 +108,27 @@ class IP {
 			if(octets.at(0) >> 7 == 0){
 				ipClass = 'A';
 				classlessIpMask = '255.0.0.0';
-				classlessIpCdir = '/8';
+				classlessIpCdir = 8;
 			}
 			else if(octets.at(0) >> 6 == 0b10){
 				ipClass = 'B';
 				classlessIpMask = '255.255.0.0';
-				classlessIpCdir = '/16';
+				classlessIpCdir = 16;
 			}
 			else if(octets.at(0) >> 5 == 0b110){
 				ipClass = 'C';
 				classlessIpMask = '255.255.255.0';
-				classlessIpCdir = '/24';
+				classlessIpCdir = 24;
 			}
-			else if(octets.at(0) >> 5 == 0b111){
+			else if(octets.at(0) >> 4 == 0b1110){
 				ipClass = 'D';
 				classlessIpMask = '255.255.255.255';
-				classlessIpCdir = '/32';
+				classlessIpCdir = 32;
+			}
+			else if(octets.at(0) >> 4 == 0b1111){
+				ipClass = 'E';
+				classlessIpMask = '255.255.255.255';
+				classlessIpCdir = 32;
 			}
 			else{
 				return false;
@@ -162,6 +167,8 @@ class IP {
 int main(){
 	
 	IP ip("192.18.0.1");
+
+	cout<<~0b101<<endl;
 
 	// ip.print([](IP *some){
 
