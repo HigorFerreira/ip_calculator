@@ -173,9 +173,12 @@ int main(){
 	
 	IP ip("192.18.0.1");
 
-	ip.print([](IP *ip){
+	string message = "Variable in main scope";
+
+	ip.print([&](IP *_ip){
 		cout<<"Insite print funtion"<<endl;
-		cout<<ip->completeIpAddress<<endl;
-		cout<<"CDIR: \\"<<ip->cdir<<endl;
+		cout<<_ip->completeIpAddress<<endl;
+		cout<<"CDIR: \\"<<_ip->cdir<<endl;
+		cout<<message<<endl;
 	});
 }
