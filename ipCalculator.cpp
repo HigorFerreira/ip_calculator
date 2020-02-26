@@ -164,9 +164,8 @@ class IP {
 			}
 		}
 
-		void print(void (*callback)(IP*) = NULL){
-			if(callback) callback(this);
-			else cout<<"No function passed"<<endl;
+		void print(function<void()> callback = NULL){
+			callback();
 		}
 };
 
@@ -174,5 +173,7 @@ int main(){
 	
 	IP ip("192.18.0.1");
 
-	ip.print();
+	ip.print([](){
+		cout<<"Insite print funtion"<<endl;
+	});
 }
