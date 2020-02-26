@@ -164,8 +164,8 @@ class IP {
 			}
 		}
 
-		void print(function<void()> callback = NULL){
-			callback();
+		void print(function<void(IP*)> callback = NULL){
+			callback(this);
 		}
 };
 
@@ -173,7 +173,9 @@ int main(){
 	
 	IP ip("192.18.0.1");
 
-	ip.print([](){
+	ip.print([](IP *ip){
 		cout<<"Insite print funtion"<<endl;
+		cout<<ip->completeIpAddress<<endl;
+		cout<<"CDIR: \\"<<ip->cdir<<endl;
 	});
 }
