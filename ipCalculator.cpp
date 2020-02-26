@@ -6,14 +6,14 @@
 using namespace std;
 
 class IP {
-	private:
+	public:
 		vector<int> octets;
+		vector<int> mask = { 0, 0, 0, 0 };
 		vector<string> errors;
 		char ipClass;
 		
 		string completeIpAddress;
-		string classlessIpMask;
-		int classlessIpCdir;
+		int cdir;
 
 		//============================ VALIDADORES =================================================
 
@@ -68,7 +68,7 @@ class IP {
 			for(size_t i = 0; i < octets.size(); i++){
 				if(octets.at(i) < 0 || octets.at(i) > 255){
 					valid = false;
-					// errors.push_back("O " + (i+1) + "º octeto \"" + octets.at(i) + "\" está fora de intervalo.");
+					errors.push_back("O " + to_string(i+1) + "º octeto \"" + to_string(octets.at(i)) + "\" está fora de intervalo.");
 				}
 			}
 
@@ -107,28 +107,28 @@ class IP {
 
 			if(octets.at(0) >> 7 == 0){
 				ipClass = 'A';
-				classlessIpMask = '255.0.0.0';
-				classlessIpCdir = 8;
+				mask[0] = 0xff;
+				cdir = 8;
 			}
 			else if(octets.at(0) >> 6 == 0b10){
 				ipClass = 'B';
-				classlessIpMask = '255.255.0.0';
-				classlessIpCdir = 16;
+				mask[0] = 0xff; mask[1] = 0xff;
+				cdir = 16;
 			}
 			else if(octets.at(0) >> 5 == 0b110){
 				ipClass = 'C';
-				classlessIpMask = '255.255.255.0';
-				classlessIpCdir = 24;
+				mask[1] = 0xff; mask[0] = 0xff; mask[2] = 0xff;
+				cdir = 24;
 			}
 			else if(octets.at(0) >> 4 == 0b1110){
 				ipClass = 'D';
-				classlessIpMask = '255.255.255.255';
-				classlessIpCdir = 32;
+				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
+				cdir = 32;
 			}
 			else if(octets.at(0) >> 4 == 0b1111){
 				ipClass = 'E';
-				classlessIpMask = '255.255.255.255';
-				classlessIpCdir = 32;
+				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
+				cdir = 32;
 			}
 			else{
 				return false;
@@ -140,14 +140,19 @@ class IP {
 	public:
 
 		/**
-		 * Construtor da classe, no qual todo novo ip é inserido **/
+		 * Construtor para IP com classe **/
 		IP(string ip){
-			if(ipFormatValidator(ip)){
-				octets.push_back(stoi(ip));
-			}
-			else{
-				errors.push_back("Ip no formato incorreto");
-			}
+			this->octets = { 192, 18, 0, 1 };
+			this->mask = { 255, 255, 255, 0 };
+			this->cdir = 24;
+			this->ipClass = 'C';
+			this->completeIpAddress = "192.18.0.1";
+		}
+
+		/**
+		 * Construtor para IP sem classe **/
+		IP(string ip, string mask){
+
 		}
 
 		void test(){
@@ -159,8 +164,9 @@ class IP {
 			}
 		}
 
-		void print(function<void> *(callback)(IP*)){
-			callback(this);
+		void print(void (*callback)(IP*) = NULL){
+			if(callback) callback(this);
+			else cout<<"No function passed"<<endl;
 		}
 };
 
@@ -168,9 +174,5 @@ int main(){
 	
 	IP ip("192.18.0.1");
 
-	cout<<~0b101<<endl;
-
-	// ip.print([](IP *some){
-
-	// });
+	ip.print();
 }
