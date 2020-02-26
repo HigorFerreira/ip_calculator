@@ -13,7 +13,7 @@ class IP {
 		char ipClass;
 		
 		string completeIpAddress;
-		int cdir;
+		int *cdir = 0;
 
 		//============================ VALIDADORES =================================================
 
@@ -108,27 +108,27 @@ class IP {
 			if(octets.at(0) >> 7 == 0){
 				ipClass = 'A';
 				mask[0] = 0xff;
-				cdir = 8;
+				this->cdir = new int(8);
 			}
 			else if(octets.at(0) >> 6 == 0b10){
 				ipClass = 'B';
 				mask[0] = 0xff; mask[1] = 0xff;
-				cdir = 16;
+				this->cdir = new int(16);
 			}
 			else if(octets.at(0) >> 5 == 0b110){
 				ipClass = 'C';
 				mask[1] = 0xff; mask[0] = 0xff; mask[2] = 0xff;
-				cdir = 24;
+				this->cdir = new int(24);
 			}
 			else if(octets.at(0) >> 4 == 0b1110){
 				ipClass = 'D';
 				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
-				cdir = 32;
+				this->cdir = new int(32);
 			}
 			else if(octets.at(0) >> 4 == 0b1111){
 				ipClass = 'E';
 				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
-				cdir = 32;
+				this->cdir = new int(32);
 			}
 			else{
 				return false;
@@ -144,7 +144,7 @@ class IP {
 		IP(string ip){
 			this->octets = { 192, 18, 0, 1 };
 			this->mask = { 255, 255, 255, 0 };
-			this->cdir = 24;
+			this->cdir = new int(24);
 			this->ipClass = 'C';
 			this->completeIpAddress = "192.18.0.1";
 		}
@@ -178,7 +178,7 @@ int main(){
 	ip.print([&](IP *_ip){
 		cout<<"Insite print funtion"<<endl;
 		cout<<_ip->completeIpAddress<<endl;
-		cout<<"CDIR: \\"<<_ip->cdir<<endl;
+		cout<<"CDIR: \\"<<*_ip->cdir<<endl;
 		cout<<message<<endl;
 	});
 }
