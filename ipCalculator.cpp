@@ -7,12 +7,12 @@ using namespace std;
 
 class IP {
 	public:
-		vector<int> octets;
-		vector<int> mask = { 0, 0, 0, 0 };
-		vector<string> errors;
-		char ipClass;
+		vector<int> *octets = 0;
+		vector<int> *mask = new vector<int>(4, 0);
+		vector<string> *errors = new vector<string>;
+		char *ipClass = 0;
 		
-		string completeIpAddress;
+		string *completeIpAddress;
 		int *cdir = 0;
 
 		//============================ VALIDADORES =================================================
@@ -30,7 +30,7 @@ class IP {
 				return true;
 			}
 			else{
-				errors.push_back("O ip digitado possui um formato incorreto");
+				errors->push_back("O ip digitado possui um formato incorreto");
 				return false;
 			}
 		}
@@ -52,7 +52,7 @@ class IP {
 			while(currentMatch != lastMatch){
 				valid = false;
 				smatch match = *currentMatch;
-				errors.push_back("O bloco: " + match.str() + "está incorreto");
+				errors->push_back("O bloco: " + match.str() + "está incorreto");
 				currentMatch++;
 			}
 
@@ -65,10 +65,10 @@ class IP {
 		bool octetsRageValidator(){
 			bool valid = true;
 
-			for(size_t i = 0; i < octets.size(); i++){
-				if(octets.at(i) < 0 || octets.at(i) > 255){
+			for(size_t i = 0; i < octets->size(); i++){
+				if(octets->at(i) < 0 || octets->at(i) > 255){
 					valid = false;
-					errors.push_back("O " + to_string(i+1) + "º octeto \"" + to_string(octets.at(i)) + "\" está fora de intervalo.");
+					errors->push_back("O " + to_string(i+1) + "º octeto \"" + to_string(octets->at(i)) + "\" está fora de intervalo.");
 				}
 			}
 
@@ -80,9 +80,10 @@ class IP {
 		/**
 		 * Função que separa os octetos
 		 * **/
-		bool breakOctets(string &ip){
+		vector<int> *breakOctets(string &ip){
 			smatch matches;
 			regex reg("\\d{1,3}");
+			vector<int> *octets = new vector<int>;
 
 			regex_search(ip, matches, reg);
 
@@ -91,11 +92,11 @@ class IP {
 
 			while(currentMatch != lastMatch){
 				smatch match = *currentMatch;
-				octets.push_back(stoi(match.str()));
+				octets->push_back(stoi(match.str()));
 				currentMatch++;
 			}
 
-			return true;
+			return octets;
 		}
 
 		/**
@@ -103,31 +104,31 @@ class IP {
 		 * e suas máscaras na notação decimal e CDIR
 		 * **/
 		bool setIpClass(){
-			if(octets.size() < 1) return false;
+			if(octets->size() < 1) return false;
 
-			if(octets.at(0) >> 7 == 0){
-				ipClass = 'A';
-				mask[0] = 0xff;
+			if(octets->at(0) >> 7 == 0){
+				ipClass = new char('A');
+				mask->at(0) = 0xff;
 				this->cdir = new int(8);
 			}
-			else if(octets.at(0) >> 6 == 0b10){
-				ipClass = 'B';
-				mask[0] = 0xff; mask[1] = 0xff;
+			else if(octets->at(0) >> 6 == 0b10){
+				ipClass = new char('B');
+				mask->at(0) = 0xff; mask->at(1) = 0xff;
 				this->cdir = new int(16);
 			}
-			else if(octets.at(0) >> 5 == 0b110){
-				ipClass = 'C';
-				mask[1] = 0xff; mask[0] = 0xff; mask[2] = 0xff;
+			else if(octets->at(0) >> 5 == 0b110){
+				ipClass = new char('C');
+				mask->at(1) = 0xff; mask->at(0) = 0xff; mask->at(2) = 0xff;
 				this->cdir = new int(24);
 			}
-			else if(octets.at(0) >> 4 == 0b1110){
-				ipClass = 'D';
-				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
+			else if(octets->at(0) >> 4 == 0b1110){
+				ipClass = new char('D');
+				mask->at(0) = 0xff; mask->at(1) = 0xff; mask->at(2) = 0xff; mask->at(3) = 0xff;
 				this->cdir = new int(32);
 			}
-			else if(octets.at(0) >> 4 == 0b1111){
-				ipClass = 'E';
-				mask[0] = 0xff; mask[1] = 0xff; mask[2] = 0xff; mask[3] = 0xff;
+			else if(octets->at(0) >> 4 == 0b1111){
+				ipClass = new char('E');
+				mask->at(0) = 0xff; mask->at(1) = 0xff; mask->at(2) = 0xff; mask->at(3) = 0xff;
 				this->cdir = new int(32);
 			}
 			else{
@@ -142,11 +143,11 @@ class IP {
 		/**
 		 * Construtor para IP com classe **/
 		IP(string ip){
-			this->octets = { 192, 18, 0, 1 };
-			this->mask = { 255, 255, 255, 0 };
+			this->octets = breakOctets(ip);
+			//this->mask = { 255, 255, 255, 0 };
 			this->cdir = new int(24);
-			this->ipClass = 'C';
-			this->completeIpAddress = "192.18.0.1";
+			this->ipClass = new char('C');
+			this->completeIpAddress = new string("192.18.0.1");
 		}
 
 		/**
@@ -155,12 +156,21 @@ class IP {
 
 		}
 
+		~IP(){
+			delete octets;
+			delete mask;
+			delete errors;
+			delete ipClass;
+			delete cdir;
+			delete completeIpAddress;
+		}
+
 		void test(){
-			if(errors.size() == 0){
-				cout<<octets.at(0);
+			if(errors->size() == 0){
+				cout<<octets->at(0);
 			}
 			else{
-				cout<<errors.at(0);
+				cout<<errors->at(0);
 			}
 		}
 
@@ -179,6 +189,19 @@ int main(){
 		cout<<"Insite print funtion"<<endl;
 		cout<<_ip->completeIpAddress<<endl;
 		cout<<"CDIR: \\"<<*_ip->cdir<<endl;
-		cout<<message<<endl;
+		cout<<"------------------------------------\n";
+		cout<<_ip->octets->at(0)<<endl;
+		cout<<_ip->octets->at(1)<<endl;
+		cout<<_ip->octets->at(2)<<endl;
+		cout<<_ip->octets->at(3)<<endl;
+		cout<<"------------------------------------\n";
+		cout<<"MASK\n";
+		cout<<"------------------------------------\n";
+		cout<<_ip->mask->at(0)<<endl;
+		cout<<_ip->mask->at(1)<<endl;
+		cout<<_ip->mask->at(2)<<endl;
+		cout<<_ip->mask->at(3)<<endl;
+		cout<<"------------------------------------\n";
+		cout<<message<<endl<<endl;
 	});
 }
