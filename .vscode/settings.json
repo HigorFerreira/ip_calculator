@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "new": "cpp",
+        "functional": "cpp",
+        "regex": "cpp",
+        "clocale": "cpp",
+        "bitset": "cpp"
     }
 }
