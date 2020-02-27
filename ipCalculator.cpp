@@ -394,6 +394,7 @@ class IP {
 			}
 			else if(this->ipClass && *this->ipClass == 'D'){
 				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
 				cout<<"Endereço IP:                               "<<*this->completeIpAddress<<endl;
 				cout<<"Classe:                                    "<<*this->ipClass<<endl;
 				cout<<"Endereço reservado para multicast"<<endl;
@@ -401,6 +402,7 @@ class IP {
 			}
 			else if(this->ipClass && *this->ipClass == 'E'){
 				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
 				cout<<"Endereço IP:                               "<<*this->completeIpAddress<<endl;
 				cout<<"Classe:                                    "<<*this->ipClass<<endl;
 				cout<<"Endereço reservado para uso futuro"<<endl;
@@ -419,18 +421,64 @@ int main(){
 	
 	setlocale(LC_ALL, "Portuguese");
 	
-	IP ip("191.10.95.30", "/18");
-
-	ip.print([&](IP *_ip){
-		cout<<"Endereço IP:                               "<<*_ip->completeIpAddress<<endl;
-		if(_ip->ipClass) cout<<"Classe:                                    "<<*_ip->ipClass<<endl;
-		cout<<"Máscara decimal:                           "<<_ip->getDecimalMask()<<endl;
-		cout<<"Máscara CDIR:                              /"<<*_ip->cdir<<endl;
-		cout<<"Número de hosts:                           "<<*_ip->numberOfHosts<<endl;
-		cout<<"Endereço de rede:                          "<<_ip->getFirstAddress()<<endl;
-		cout<<"Endereço de broadcast:                     "<<_ip->getBroadcastAddress()<<endl;
-		cout<<"Endereço IP inicial utilizável:            "<<_ip->getFirtsUsableAddress()<<endl;
-		cout<<"Endereço IP final utilizável:              "<<_ip->getLastUsableAddress()<<endl;
-		cout<<"------------------------------------------------------------------------------------------------------------\n";
-	});
+	char tryAgain = 'A';
+	do{
+		short option;
+		system("cls");
+		cout<<"Calculadora IPV4\nRedes de Computadores II\nAluno: Higor Ferreira Alves Santos\n\n"
+		<<"Opções:\n1 - Calcular IP com classe\n2 - Calcular IP sem classe e notação CIDR\n3 - Calcular IP sem classe e notação decimal\n"
+		<<"--------------------------------------------\nDigite o número da opção desejada:\n";
+		cin>>option;
+		if(option > 0 && option < 4){
+			IP *ip;
+			string ipInput, maskInput;
+						
+			switch(option){
+				case 1:
+					system("cls");
+					cout<<"Calcular IP com classe\n";
+					cout<<"Digite o IP (padrão: n.n.n.n)\n";
+					cin>>ipInput;
+					ip = new IP(ipInput);
+					break;
+				case 2:
+					system("cls");
+					cout<<"Calcular IP sem classe e notação CIDR\n";
+					cout<<"Digite o IP e a máscara CDIR (padrão: n.n.n.n /n)\n";
+					cin>>ipInput;
+					cin>>maskInput;
+					ip = new IP(ipInput, maskInput);
+					break;
+				case 3:
+					system("cls");
+					cout<<"Calcular IP sem classe e notação decimal\n";
+					cout<<"Digite o IP e a máscara decimal (padrão: n.n.n.n n.n.n.n)\n";
+					cin>>ipInput;
+					cin>>maskInput;
+					ip = new IP(ipInput, maskInput);
+					break;
+			}
+			
+			ip->print([&](IP *_ip){
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
+				cout<<"Endereço IP:                               "<<*_ip->completeIpAddress<<endl;
+				if(_ip->ipClass) cout<<"Classe:                                    "<<*_ip->ipClass<<endl;
+				cout<<"Máscara decimal:                           "<<_ip->getDecimalMask()<<endl;
+				cout<<"Máscara CIDR:                              /"<<*_ip->cdir<<endl;
+				cout<<"Número de hosts:                           "<<*_ip->numberOfHosts<<endl;
+				cout<<"Endereço de rede:                          "<<_ip->getFirstAddress()<<endl;
+				cout<<"Endereço de broadcast:                     "<<_ip->getBroadcastAddress()<<endl;
+				cout<<"Endereço IP inicial utilizável:            "<<_ip->getFirtsUsableAddress()<<endl;
+				cout<<"Endereço IP final utilizável:              "<<_ip->getLastUsableAddress()<<endl;
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
+			});
+		}
+		else{
+			cout<<"------------------------------------------------------------------------------------------------------------\n"
+			<<"Esta opção não existe.\n";		
+		}
+		
+		cout<<"\n\nDeseja calcular outro ip? ( \"y\" para calcular, qualquer outro dígito para sair ):  ";
+		cin>>tryAgain;
+	}while(tryAgain == 'y');
 }
