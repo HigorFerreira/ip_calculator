@@ -34,11 +34,11 @@ class IP {
 		//============================ VALIDADORES =================================================
 
 		/**
-		 * Fun√ß√£o de valida√ß√£o do IP pelo formato
+		 * FunÁ„o de validaÁ„o do IP pelo formato
 		 * Retorna verdadeiro para um ip no formato XXX.XXX.XXX.XXX,
-		 * X um d√≠gito decimal, podendo o n√∫mero de digitos variar
-		 * de 1 √† 3.
-		 * Retorna falso caso contr√°rio  * */
+		 * X um dÌgito decimal, podendo o n˙mero de digitos variar
+		 * de 1 ‡† 3.
+		 * Retorna falso caso contr·rio  * */
 		bool ipFormatValidator(string &ip){
 			smatch ipFormatMatch;
 			regex ipFormatRegex("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$");
@@ -52,7 +52,7 @@ class IP {
 		}
 
 		/**
-		 * Fun√ß√£o de valida√ß√£o do formato das m√°scaras **/
+		 * FunÁ„o de validaÁ„o do formato das m·scaras **/
 		bool maskFormatValidator(string &ip){
 			smatch maskFormatMatch;
 			regex maskFormatRegex("(^\\/\\d{1,2}$)|(^(\\d{1,3}\\.){3}\\d{1,3}$)");
@@ -60,14 +60,14 @@ class IP {
 				return true;
 			}
 			else{
-				this->errors->push_back("A mÔøΩscara digitada possui um formato incorreto");
+				this->errors->push_back("A m·scara digitada possui um formato incorreto");
 				return false;
 			}
 		}
 
 		/**
-		 * Fun√ß√£o que verifica a exist√™ncia de digitos zero
-		 * inv√°lidos no ip, exemplo: 192.01.0.1
+		 * FunÁ„o que verifica a existÍncia de digitos zero
+		 * inv·lidos no ip, exemplo: 192.01.0.1
 		 * **/
 		bool ipZerosValidator(string &ip, bool mask = false){
 			bool valid = true;
@@ -82,7 +82,7 @@ class IP {
 			while(currentMatch != lastMatch){
 				valid = false;
 				smatch match = *currentMatch;
-				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da mÔøΩscara" : "do ip") + " estÔøΩ incorreta, nÔøΩo pode haver dÔøΩgito precedido por zero.");
+				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da m·scara" : "do ip") + " est· incorreta, n„o pode haver dÌgito precedido por zero.");
 				currentMatch++;
 			}
 
@@ -94,16 +94,16 @@ class IP {
 		}
 
 		/**
-		 * Valida√ß√£o do intervalo dos octetos
+		 * ValidaÁ„o do intervalo dos octetos
 		 * **/
 		bool octetsRangeValidator(){
-			if(!this->octets) throw string("Octetos de IP nÔøΩo definidos");
+			if(!this->octets) throw string("Octetos de IP n„o definidos");
 			bool valid = true;
 
 			iterator<int>(this->octets, [&](int octet, int i){
 				if(octet < 0 || octet > 255){
 					valid = false;
-					this->errors->push_back("O " + to_string(i+1) + "¬∫ octeto \"" + to_string(octet) + "\" est√° fora de intervalo.");
+					this->errors->push_back("O " + to_string(i+1) + "∫ octeto \"" + to_string(octet) + "\" est· fora de intervalo.");
 				}
 			});
 
@@ -111,27 +111,27 @@ class IP {
 		}
 
 		/**
-		 * Valida√ß√£o do intervalo dos octetos de uma m√°scara decimal
+		 * ValidaÁ„o do intervalo dos octetos de uma m·scara decimal
 		 * **/
 		bool maskOctetsRangeValidator(){
-			/** Transformando a m√°scara em bin√°rio **/
+			/** Transformando a m·scara em bin·rio **/
 			string binaryMask = "";
 			iterator<int>(this->mask, [&](int el){
 				binaryMask += bitset<8>(el).to_string();
 			});
-			/** Validando o intervalo da m√°scara **/
+			/** Validando o intervalo da m·scara **/
 			smatch match;
 			regex reg("^1+0+$");
 			if(regex_match(binaryMask, match, reg)){
 				return true;
 			}
 			else{
-				this->errors->push_back("A m√°scara digitada n√£o √© v√°lida");
+				this->errors->push_back("A m·scara digitada n„o È v·lida");
 				return false;
 			}
 		}
 
-		/** Determina√ß√£o do tipo da m√°scara **/
+		/** DeterminaÁ„o do tipo da m·scara **/
 		short getMaskType(string &mask){
 			smatch match;
 			regex reg("^\\/\\d{1,2}$");
@@ -168,7 +168,7 @@ class IP {
 		//============================ ITERADORES ==================================================
 
 		/**
-		 * Fun√ß√£o que separa os octetos
+		 * FunÁ„o que separa os octetos
 		 * **/
 		vector<int> *breakOctets(string &ip){
 			smatch matches;
@@ -190,14 +190,14 @@ class IP {
 		}
 
 		/**
-		 * Fun√ß√£o que define o classe do Ip,
-		 * e suas m√°scaras na nota√ß√£o decimal e CDIR
+		 * FunÁ„o que define o classe do Ip,
+		 * e suas m·scaras na notaÁ„o decimal e CDIR
 		 * **/
 		bool setIpParamsBasedOnClass(){
-			if(!this->octets) throw string("Octetos de IP nÔøΩo definidos");
+			if(!this->octets) throw string("Octetos de IP n„o definidos");
 			if(octets->size() < 1) return false;
 
-			//Aloca√ß√£o dos octetod da m√°scara
+			//AlocaÁ„o dos octetos da m·scara
 			this->mask = new vector<int>(4, 0);
 
 			if(octets->at(0) >> 7 == 0){
@@ -229,7 +229,7 @@ class IP {
 				return false;
 			}
 
-			//Definindo o n√∫mero de hosts
+			//Definindo o n˙mero de hosts
 			this->numberOfHosts = new int(pow(2, 32-*this->cdir) - 2);
 
 			return true;
@@ -250,14 +250,14 @@ class IP {
 			if(this->numberOfHosts) delete this->numberOfHosts;
 			bool valid = true;
 			if(getMaskType(mask) == MASK_DECC){
-				//Valida√ß√£o e armazenamento da m√°scara
+				//ValidaÁ„o e armazenamento da m·sscara
 				valid = maskFormatValidator(mask) && maskZeroValidator(mask);
 				this->mask = breakOctets(mask);
 				valid = maskOctetsRangeValidator();
 
 				/**
-				 * Contagem de zeros para a defini√ß√£o da nota√ß√£o CDIR,
-				 * O n√∫mero CDIR √© obtido com (32 - qttZeros)
+				 * Contagem de zeros para a definiÁ„o da notaÁ„o CDIR,
+				 * O n˙mero CDIR È obtido com (32 - qttZeros)
 				 * */
 				int numberOfZeros = 0;
 				int bit;
@@ -282,7 +282,7 @@ class IP {
 				}
 
 				/**
-				 * Convers√£o CDIR em decimal **/
+				 * Convers„o CDIR em decimal **/
 				int octet = 0xff;
 				size_t iteration = 1;
 				do{
@@ -394,16 +394,16 @@ class IP {
 			}
 			else if(this->ipClass && *this->ipClass == 'D'){
 				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
-				cout<<"Endere√ßo IP:                               "<<*this->completeIpAddress<<endl;
+				cout<<"EndereÁo IP:                               "<<*this->completeIpAddress<<endl;
 				cout<<"Classe:                                    "<<*this->ipClass<<endl;
-				cout<<"Endere√ßo reservado para multicast"<<endl;
+				cout<<"EndereÁo reservado para multicast"<<endl;
 				cout<<"------------------------------------------------------------------------------------------------------------\n";
 			}
 			else if(this->ipClass && *this->ipClass == 'E'){
 				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
-				cout<<"Endere√ßo IP:                               "<<*this->completeIpAddress<<endl;
+				cout<<"EndereÁo IP:                               "<<*this->completeIpAddress<<endl;
 				cout<<"Classe:                                    "<<*this->ipClass<<endl;
-				cout<<"Endere√ßo reservado para uso futuro"<<endl;
+				cout<<"EndereÁo reservado para uso futuro"<<endl;
 				cout<<"------------------------------------------------------------------------------------------------------------\n";
 			}
 			else{
@@ -422,15 +422,15 @@ int main(){
 	IP ip("191.10.95.30", "/18");
 
 	ip.print([&](IP *_ip){
-		cout<<"Endere√ßo IP:                               "<<*_ip->completeIpAddress<<endl;
+		cout<<"EndereÁo IP:                               "<<*_ip->completeIpAddress<<endl;
 		if(_ip->ipClass) cout<<"Classe:                                    "<<*_ip->ipClass<<endl;
-		cout<<"M√°scara decimal:                           "<<_ip->getDecimalMask()<<endl;
-		cout<<"M√°scara CDIR:                              /"<<*_ip->cdir<<endl;
-		cout<<"N√∫mero de hosts:                           "<<*_ip->numberOfHosts<<endl;
-		cout<<"Endere√ßo de rede:                          "<<_ip->getFirstAddress()<<endl;
-		cout<<"Endere√ßo de broadcast:                     "<<_ip->getBroadcastAddress()<<endl;
-		cout<<"Endere√ßo IP inicial utiliz√°vel:            "<<_ip->getFirtsUsableAddress()<<endl;
-		cout<<"Endere√ßo IP final utiliz√°vel:              "<<_ip->getLastUsableAddress()<<endl;
+		cout<<"M·scara decimal:                           "<<_ip->getDecimalMask()<<endl;
+		cout<<"M·scara CDIR:                              /"<<*_ip->cdir<<endl;
+		cout<<"N˙mero de hosts:                           "<<*_ip->numberOfHosts<<endl;
+		cout<<"EndereÁo de rede:                          "<<_ip->getFirstAddress()<<endl;
+		cout<<"EndereÁo de broadcast:                     "<<_ip->getBroadcastAddress()<<endl;
+		cout<<"EndereÁo IP inicial utiliz·vel:            "<<_ip->getFirtsUsableAddress()<<endl;
+		cout<<"EndereÁo IP final utiliz·vel:              "<<_ip->getLastUsableAddress()<<endl;
 		cout<<"------------------------------------------------------------------------------------------------------------\n";
 	});
 }
