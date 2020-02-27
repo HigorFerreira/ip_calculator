@@ -5,6 +5,7 @@
         "new": "cpp",
         "functional": "cpp",
         "regex": "cpp",
-        "clocale": "cpp"
+        "clocale": "cpp",
+        "bitset": "cpp"
     }
 }

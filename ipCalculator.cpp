@@ -1,10 +1,19 @@
 #include<iostream>
 #include<clocale>
+#include<cmath>
+#include<bitset>
 #include<regex>
 #include<vector>
 #include<functional>
+#include<windows.h>
 
 using namespace std;
+
+HANDLE hStdout = GetStdHandle(0xfffffff5);
+const short RED_CONSOLE_COLOR = 4;
+const short GREEN_CONSOLE_COLOR = 2;
+const short BLUE_CONSOLE_COLOR = 1;
+const short DEFAULT_CONSOLE_COLOR = 4 | 2 | 1;
 
 class IP {
 	public:
@@ -15,10 +24,12 @@ class IP {
 		vector<int> *octets = 0;
 		vector<int> *mask = 0;
 		vector<string> *errors = new vector<string>;
-		char *ipClass = 0;
+		char *ipClass = NULL;
 		
 		string *completeIpAddress;
 		int *cdir = 0;
+
+		int *numberOfHosts = NULL;
 
 		//============================ VALIDADORES =================================================
 
@@ -49,7 +60,7 @@ class IP {
 				return true;
 			}
 			else{
-				this->errors->push_back("A m�scara digitada possui um formato incorreto");
+				this->errors->push_back("A m�scara digitada possui um formato incorreto");
 				return false;
 			}
 		}
@@ -71,7 +82,7 @@ class IP {
 			while(currentMatch != lastMatch){
 				valid = false;
 				smatch match = *currentMatch;
-				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da m�scara" : "do ip") + " est� incorreta, n�o pode haver d�gito precedido por zero.");
+				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da m�scara" : "do ip") + " est� incorreta, n�o pode haver d�gito precedido por zero.");
 				currentMatch++;
 			}
 
@@ -86,13 +97,13 @@ class IP {
 		 * Validação do intervalo dos octetos
 		 * **/
 		bool octetsRangeValidator(){
-			if(!this->octets) throw string("Octetos de IP n�o definidos");
+			if(!this->octets) throw string("Octetos de IP n�o definidos");
 			bool valid = true;
 
 			iterator<int>(this->octets, [&](int octet, int i){
 				if(octet < 0 || octet > 255){
 					valid = false;
-					this->errors->push_back("O " + to_string(i+1) + "� octeto \"" + to_string(octet) + "\" est� fora de intervalo.");
+					this->errors->push_back("O " + to_string(i+1) + "º octeto \"" + to_string(octet) + "\" está fora de intervalo.");
 				}
 			});
 
@@ -103,17 +114,24 @@ class IP {
 		 * Validação do intervalo dos octetos de uma máscara decimal
 		 * **/
 		bool maskOctetsRangeValidator(){
-			if(!this->mask) throw string("Octetos de m�scara n�o definidos");
-			bool valid = true;
-
-			iterator<int>(this->mask, [&](int maskOctet, int i){
-				valid = false;
-				this->errors->push_back("O " + to_string(i+1) + "� octeto da m�scara \"" + to_string(maskOctet) + "\" est� fora de intervalo.");
+			/** Transformando a máscara em binário **/
+			string binaryMask = "";
+			iterator<int>(this->mask, [&](int el){
+				binaryMask += bitset<8>(el).to_string();
 			});
-
-			return valid;
+			/** Validando o intervalo da máscara **/
+			smatch match;
+			regex reg("^1+0+$");
+			if(regex_match(binaryMask, match, reg)){
+				return true;
+			}
+			else{
+				this->errors->push_back("A máscara digitada não é válida");
+				return false;
+			}
 		}
 
+		/** Determinação do tipo da máscara **/
 		short getMaskType(string &mask){
 			smatch match;
 			regex reg("^\\/\\d{1,2}$");
@@ -176,7 +194,7 @@ class IP {
 		 * e suas máscaras na notação decimal e CDIR
 		 * **/
 		bool setIpParamsBasedOnClass(){
-			if(!this->octets) throw string("Octetos de IP n�o definidos");
+			if(!this->octets) throw string("Octetos de IP n�o definidos");
 			if(octets->size() < 1) return false;
 
 			//Alocação dos octetod da máscara
@@ -211,7 +229,86 @@ class IP {
 				return false;
 			}
 
+			//Definindo o número de hosts
+			this->numberOfHosts = new int(pow(2, 32-*this->cdir) - 2);
+
 			return true;
+		}
+
+		bool getValidatedIp(string &ip){
+			bool valid = ipFormatValidator(ip) && ipZerosValidator(ip);
+			this->octets = breakOctets(ip);
+			valid = octetsRangeValidator() && setIpParamsBasedOnClass();
+			this->completeIpAddress = new string(ip);
+			return valid;
+		}
+
+		bool setIpParamsBasedOnMask(string &mask){
+			if(this->mask) delete this->mask;
+			if(this->ipClass) { delete this->ipClass; this->ipClass = NULL; }
+			if(this->cdir) delete this->cdir;
+			if(this->numberOfHosts) delete this->numberOfHosts;
+			bool valid = true;
+			if(getMaskType(mask) == MASK_DECC){
+				//Validação e armazenamento da máscara
+				valid = maskFormatValidator(mask) && maskZeroValidator(mask);
+				this->mask = breakOctets(mask);
+				valid = maskOctetsRangeValidator();
+
+				/**
+				 * Contagem de zeros para a definição da notação CDIR,
+				 * O número CDIR é obtido com (32 - qttZeros)
+				 * */
+				int numberOfZeros = 0;
+				int bit;
+				this->iterator<int>(this->mask, [&](int octet){
+					for(size_t i = 0; i < 8; i++){
+						int shiftedOctet = octet>>numberOfZeros;
+						bit = shiftedOctet & 1;
+						if(bit == 0) numberOfZeros++;
+					}
+				});
+
+				this->cdir = new int(32 - numberOfZeros);
+			}
+			else{
+				this->mask = new vector<int>;
+				this->cdir = new int(stoi(mask.substr(1,2)));
+
+				valid = *this->cdir > 0 && *this->cdir < 33;
+				if(!valid){
+					this->errors->push_back("CDIR fora de intervalo.");
+					return false;
+				}
+
+				/**
+				 * Conversão CDIR em decimal **/
+				int octet = 0xff;
+				size_t iteration = 1;
+				do{
+					octet >>= 1;
+					if(iteration % 8 == 0){
+						this->mask->push_back(octet);
+						octet = 0xff;
+					}
+					iteration++;
+				}while(iteration != *this->cdir+1);
+
+				if(this->mask->size() < 4) this->mask->push_back(octet);
+				while(this->mask->size() < 4){
+					this->mask->push_back(0xff);
+				}
+
+				iterator<int>(this->mask, [](int value, int i, vector<int> *_mask){
+					value = ~value;
+					value &= 0xff;
+					_mask->at(i) = value;
+				});
+			}
+
+			this->numberOfHosts = new int(pow(2, 32-*this->cdir) - 2);
+
+			return valid;
 		}
 
 	public:
@@ -219,23 +316,14 @@ class IP {
 		/**
 		 * Construtor para IP com classe **/
 		IP(string ip){
-			//Validação do IP
-			ipFormatValidator(ip);
-			ipZerosValidator(ip);
-			//Definição dos octetos
-			this->octets = breakOctets(ip);
-			//Validando os intervalos dos octetos
-			octetsRangeValidator();
-			//Setando os parâmetros baseado na classe
-			setIpParamsBasedOnClass();
-
-			this->completeIpAddress = new string(ip);
+			getValidatedIp(ip);
 		}
 
 		/**
 		 * Construtor para IP sem classe **/
 		IP(string ip, string mask){
-
+			getValidatedIp(ip);
+			setIpParamsBasedOnMask(mask);
 		}
 
 		~IP(){
@@ -247,24 +335,83 @@ class IP {
 			delete completeIpAddress;
 		}
 
-		void test(){
-			if(errors->size() == 0){
-				cout<<octets->at(0);
+		string getDecimalMask(){
+			string mask = "";
+			for(size_t i = 0; i < 3; i++){
+				mask += to_string(this->mask->at(i)) + ".";
 			}
-			else{
-				cout<<errors->at(0);
-			}
+			return mask + to_string(this->mask->at(3));
+		}
+
+		string getFirstAddress(bool usable = false){
+			string addressStr = "";
+			vector<int> address;
+			iterator<int>(this->octets, [&](int oct, int i){
+				address.push_back(oct & this->mask->at(i));
+			});
+
+			if(usable) address.at(3) += 1;
+
+			for(size_t i = 0; i < 3; i++) addressStr += to_string(address.at(i)) + ".";
+			return addressStr + to_string(address.at(3));
+		}
+
+		string getFirtsUsableAddress(){
+			return getFirstAddress(true);
+		}
+
+		string getBroadcastAddress(bool usable = false){
+			string addressStr = "";
+			vector<int> address;
+			iterator<int>(this->octets, [&](int oct, int i){
+				int maskComplement = ~(this->mask->at(i));
+				maskComplement &= 0xff;
+				address.push_back(oct | maskComplement);
+			});
+
+			if(usable) address.at(3) -= 1;
+
+			for(size_t i = 0; i < 3; i++) addressStr += to_string(address.at(i)) + ".";
+			return addressStr + to_string(address.at(3));
+		}
+
+		string getLastUsableAddress(){
+			return getBroadcastAddress(true);
 		}
 
 		void print(function<void(IP*)> callback = NULL){
 			if(this->errors->size() > 0){
-				this->iterator<string>(this->errors, [&](string error){
-					cout<<error<<endl;
+				SetConsoleTextAttribute(hStdout, RED_CONSOLE_COLOR);
+				cout<<"============================================================================================================\n";
+				cout<<"                                     ERRO NO IP:  "<<*this->completeIpAddress<<"    \n";
+				cout<<"============================================================================================================\n";
+				cout<<this->errors->size()<<" erros encontrados\n";
+				cout<<"-------------------------------------------------------------------------------------------\n";
+				this->iterator<string>(this->errors, [](string error, int index){
+					cout<<index+1<<" --> "<<error<<endl;
 				});
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
+			}
+			else if(this->ipClass && *this->ipClass == 'D'){
+				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
+				cout<<"Endereço IP:                               "<<*this->completeIpAddress<<endl;
+				cout<<"Classe:                                    "<<*this->ipClass<<endl;
+				cout<<"Endereço reservado para multicast"<<endl;
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
+			}
+			else if(this->ipClass && *this->ipClass == 'E'){
+				SetConsoleTextAttribute(hStdout, GREEN_CONSOLE_COLOR);
+				cout<<"Endereço IP:                               "<<*this->completeIpAddress<<endl;
+				cout<<"Classe:                                    "<<*this->ipClass<<endl;
+				cout<<"Endereço reservado para uso futuro"<<endl;
+				cout<<"------------------------------------------------------------------------------------------------------------\n";
 			}
 			else{
+				SetConsoleTextAttribute(hStdout, BLUE_CONSOLE_COLOR);
 				callback(this);
 			}
+
+			SetConsoleTextAttribute(hStdout, DEFAULT_CONSOLE_COLOR);
 		}
 };
 
@@ -272,28 +419,18 @@ int main(){
 	
 	setlocale(LC_ALL, "Portuguese");
 	
-	IP ip("192.18.05.1");
-
-	string message = "Variable in main scope";
+	IP ip("191.10.95.30", "/18");
 
 	ip.print([&](IP *_ip){
-		cout<<"Insite print funtion"<<endl;
-		cout<<*_ip->completeIpAddress<<endl;
-		cout<<"Classe: "<<*_ip->ipClass<<endl;
-		cout<<"CDIR: \\"<<*_ip->cdir<<endl;
-		cout<<"------------------------------------\n";
-		cout<<_ip->octets->at(0)<<endl;
-		cout<<_ip->octets->at(1)<<endl;
-		cout<<_ip->octets->at(2)<<endl;
-		cout<<_ip->octets->at(3)<<endl;
-		cout<<"------------------------------------\n";
-		cout<<"MASK\n";
-		cout<<"------------------------------------\n";
-		cout<<_ip->mask->at(0)<<endl;
-		cout<<_ip->mask->at(1)<<endl;
-		cout<<_ip->mask->at(2)<<endl;
-		cout<<_ip->mask->at(3)<<endl;
-		cout<<"------------------------------------\n";
-		cout<<message<<endl<<endl;
+		cout<<"Endereço IP:                               "<<*_ip->completeIpAddress<<endl;
+		if(_ip->ipClass) cout<<"Classe:                                    "<<*_ip->ipClass<<endl;
+		cout<<"Máscara decimal:                           "<<_ip->getDecimalMask()<<endl;
+		cout<<"Máscara CDIR:                              /"<<*_ip->cdir<<endl;
+		cout<<"Número de hosts:                           "<<*_ip->numberOfHosts<<endl;
+		cout<<"Endereço de rede:                          "<<_ip->getFirstAddress()<<endl;
+		cout<<"Endereço de broadcast:                     "<<_ip->getBroadcastAddress()<<endl;
+		cout<<"Endereço IP inicial utilizável:            "<<_ip->getFirtsUsableAddress()<<endl;
+		cout<<"Endereço IP final utilizável:              "<<_ip->getLastUsableAddress()<<endl;
+		cout<<"------------------------------------------------------------------------------------------------------------\n";
 	});
 }
