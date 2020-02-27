@@ -49,7 +49,7 @@ class IP {
 				return true;
 			}
 			else{
-				this->errors->push_back("A mÃ¡scara digitada possui um formato incorreto");
+				this->errors->push_back("A máscara digitada possui um formato incorreto");
 				return false;
 			}
 		}
@@ -71,7 +71,7 @@ class IP {
 			while(currentMatch != lastMatch){
 				valid = false;
 				smatch match = *currentMatch;
-				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da mÃ¡scara" : "do ip") + " estÃ¡ incorreta, nÃ£o pode haver dÃ­gito precedido por zero.");
+				errors->push_back("A parte: \"" + match.str() + "\" " + (mask ? "da máscara" : "do ip") + " está incorreta, não pode haver dígito precedido por zero.");
 				currentMatch++;
 			}
 
@@ -86,13 +86,13 @@ class IP {
 		 * ValidaÃ§Ã£o do intervalo dos octetos
 		 * **/
 		bool octetsRangeValidator(){
-			if(!this->octets) throw string("Octetos de IP nÃ£o definidos");
+			if(!this->octets) throw string("Octetos de IP não definidos");
 			bool valid = true;
 
 			iterator<int>(this->octets, [&](int octet, int i){
 				if(octet < 0 || octet > 255){
 					valid = false;
-					this->errors->push_back("O " + to_string(i+1) + "Âº octeto \"" + to_string(octet) + "\" estÃ¡ fora de intervalo.");
+					this->errors->push_back("O " + to_string(i+1) + "º octeto \"" + to_string(octet) + "\" está fora de intervalo.");
 				}
 			});
 
@@ -103,12 +103,12 @@ class IP {
 		 * ValidaÃ§Ã£o do intervalo dos octetos de uma mÃ¡scara decimal
 		 * **/
 		bool maskOctetsRangeValidator(){
-			if(!this->mask) throw string("Octetos de mÃ¡scara nÃ£o definidos");
+			if(!this->mask) throw string("Octetos de máscara não definidos");
 			bool valid = true;
 
 			iterator<int>(this->mask, [&](int maskOctet, int i){
 				valid = false;
-				this->errors->push_back("O " + to_string(i+1) + "Âº octeto da mÃ¡scara \"" + to_string(maskOctet) + "\" estÃ¡ fora de intervalo.");
+				this->errors->push_back("O " + to_string(i+1) + "º octeto da máscara \"" + to_string(maskOctet) + "\" está fora de intervalo.");
 			});
 
 			return valid;
@@ -176,7 +176,7 @@ class IP {
 		 * e suas mÃ¡scaras na notaÃ§Ã£o decimal e CDIR
 		 * **/
 		bool setIpParamsBasedOnClass(){
-			if(!this->octets) throw string("Octetos de IP nÃ£o definidos");
+			if(!this->octets) throw string("Octetos de IP não definidos");
 			if(octets->size() < 1) return false;
 
 			//AlocaÃ§Ã£o dos octetod da mÃ¡scara
