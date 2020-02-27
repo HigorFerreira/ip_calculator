@@ -3,6 +3,8 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "new": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "regex": "cpp",
+        "clocale": "cpp"
     }
 }
