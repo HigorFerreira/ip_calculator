@@ -108,7 +108,7 @@ public:
 			if (octet < 0 || octet > 255)
 			{
 				valid = false;
-				this->errors->push_back("O " + to_string(i + 1) + "º octeto \\\"" + to_string(octet) + "\\\" esta fora de intervalo.");
+				this->errors->push_back("O octeto numero " + to_string(i + 1) + ", \\\"" + to_string(octet) + "\\\" esta fora de intervalo.");
 			}
 		});
 
@@ -212,7 +212,7 @@ public:
 	bool setIpParamsBasedOnClass()
 	{
 		if (!this->octets)
-			throw string("Octetos de IP nso definidos");
+			throw string("Octetos de IP nao definidos");
 		if (octets->size() < 1)
 			return false;
 
