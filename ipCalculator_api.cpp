@@ -59,7 +59,7 @@ public:
 		}
 		else
 		{
-			this->errors->push_back("A máscara digitada possui um formato incorreto");
+			this->errors->push_back("A mascara digitada possui um formato incorreto");
 			return false;
 		}
 	}
@@ -83,7 +83,7 @@ public:
 		{
 			valid = false;
 			smatch match = *currentMatch;
-			errors->push_back("A parte: \\\"" + match.str() + "\\\" " + (mask ? "da máscara" : "do ip") + " está incorreta, não pode haver dígito precedido por zero.");
+			errors->push_back("A parte: \\\"" + match.str() + "\\\" " + (mask ? "da mascara" : "do ip") + " esta incorreta, nao pode haver digito precedido por zero.");
 			currentMatch++;
 		}
 
@@ -101,14 +101,14 @@ public:
 	bool octetsRangeValidator()
 	{
 		if (!this->octets)
-			throw string("Octetos de IP não definidos");
+			throw string("Octetos de IP nao definidos");
 		bool valid = true;
 
 		iterator<int>(this->octets, [&](int octet, int i) {
 			if (octet < 0 || octet > 255)
 			{
 				valid = false;
-				this->errors->push_back("O " + to_string(i + 1) + "º octeto \\\"" + to_string(octet) + "\\\" está fora de intervalo.");
+				this->errors->push_back("O " + to_string(i + 1) + "º octeto \\\"" + to_string(octet) + "\\\" esta fora de intervalo.");
 			}
 		});
 
@@ -134,7 +134,7 @@ public:
 		}
 		else
 		{
-			this->errors->push_back("A máscara digitada não é válida");
+			this->errors->push_back("A mascara digitada nao e valida");
 			return false;
 		}
 	}
@@ -212,7 +212,7 @@ public:
 	bool setIpParamsBasedOnClass()
 	{
 		if (!this->octets)
-			throw string("Octetos de IP não definidos");
+			throw string("Octetos de IP nso definidos");
 		if (octets->size() < 1)
 			return false;
 
@@ -459,13 +459,13 @@ public:
 		{
 			cout<<"{\"ip\":{\"ip_address\":\""<< *this->completeIpAddress <<"\","<<
 			"\"ip_class\":\""<< *this->ipClass <<"\","<<
-			"\"more\":\"Endereço reservado para multicast\"}}";
+			"\"more\":\"Endereco reservado para multicast\"}}";
 		}
 		else if (this->ipClass && *this->ipClass == 'E')
 		{
 			cout<<"{\"ip\":{\"ip_address\":\""<< *this->completeIpAddress <<"\","<<
 			"\"ip_class\":\""<< *this->ipClass <<"\","<<
-			"\"more\":\"Endereço reservado para uso futuro\"}}";
+			"\"more\":\"Endereco reservado para uso futuro\"}}";
 		}
 		else
 		{
@@ -476,9 +476,6 @@ public:
 
 int main(int argc, char *argv[])
 {
-
-	setlocale(LC_ALL, "Portuguese");
-
 	short option = stoi(argv[1]);
 
 	if (option > 0 && option < 4)
@@ -505,6 +502,6 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		cout<<"{\"error\":{\"message\":\"Esta opção não existe.\",\"numberOfErrors\":0,\"errors\":[]}}";
+		cout<<"{\"error\":{\"message\":\"Esta opcao nao existe.\",\"numberOfErrors\":0,\"errors\":[]}}";
 	}
 }
