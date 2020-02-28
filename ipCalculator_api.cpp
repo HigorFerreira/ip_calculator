@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
 
 		ip->print([&](IP *_ip) {
 
-			cout<<"{\"ip\":{\"ip_address\":\""<<*_ip->completeIpAddress<<"\",\"ip_class\":\""<< (_ip->ipClass ? *_ip->ipClass : '\0')  <<"\","<<
+			cout<<"{\"ip\":{\"ip_address\":\""<<*_ip->completeIpAddress<<"\",\"ip_class\":\""<< (_ip->ipClass ? string(_ip->ipClass) : "")  <<"\","<<
 			"\"ip_decc_mask\":\""<< _ip->getDecimalMask() <<"\",\"ip_cidr_mask\":\""<< *_ip->cdir <<"\",\"number_of_hosts\":"<< *_ip->numberOfHosts <<","<<
 			"\"lan_address\":\""<< _ip->getFirstAddress() <<"\",\"broadcast_address\":\""<< _ip->getBroadcastAddress() <<"\",\"first_usable_ip\":\""<< _ip->getFirtsUsableAddress() <<"\","<<
 			"\"last_usable_ip\":\""<< _ip->getLastUsableAddress() <<"\"}}";
